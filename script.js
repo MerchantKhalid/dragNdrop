@@ -54,6 +54,12 @@ function updateSavedColumns() {
   // localStorage.setItem('onHoldItems', JSON.stringify(onHoldListArray));
 }
 
+function filterArray(array){
+  const filteredArray= array.filter(item=> item!== null)
+  return filteredArray; 
+
+}
+
 // Create DOM Elements for each list item
 function createItemEl(columnEl, column, item, index) {
   console.log('columnEl:', columnEl);
@@ -66,6 +72,9 @@ function createItemEl(columnEl, column, item, index) {
   listEl.textContent=item;
   listEl.draggable= true;
   listEl.setAttribute('ondragstart','drag(event)');
+  listEl.contentEditable='true';
+  listEl.id= index;
+  listEl.setAttribute('onfocusout',`updateItem (${index},${column})`);
 
   //append
   columnEl.appendChild(listEl)
@@ -84,29 +93,43 @@ function updateDOM() {
   backlogListArray.forEach((backlogItem,i)=>{
     createItemEl(backlogList,0,backlogItem,i);
   });
+  backlogListArray=filterArray(backlogListArray)
 
   // Progress Column
   progressList.textContent='';
   progressListArray.forEach((progressItem,i)=>{
-    createItemEl(progressList,0,progressItem,i);
+    createItemEl(progressList,1,progressItem,i);
   });
+   progressListArray=filterArray(progressListArray)
 
   // Complete Column
   completeList.textContent='';
   completeListArray.forEach((completeItem,i)=>{
-    createItemEl(completeList,0,completeItem,i);
+    createItemEl(completeList,2,completeItem,i);
   });
+  completeListArray=filterArray(completeListArray)
 
   // On Hold Column
   onHoldList.textContent='';
   onHoldListArray.forEach((onHoldItem,i)=>{
-    createItemEl(onHoldList,0,onHoldItem,i);
+    createItemEl(onHoldList,3,onHoldItem,i);
   });
+  onHoldListArray=filterArray(onHoldListArray)
 
   // Run getSavedColumns only once, Update Local Storage
    UpdatedOnLoad= true;
    updateSavedColumns();
 
+}
+
+// Update Column
+function updateItem(id,column){
+  const selectedArray = listArrays[column];
+  const selectedColumnEl= listColumns[column].children;
+  if(!selectedColumnEl[id].textContent){
+    delete selectedArray[id];
+  }
+  updateDOM();
 }
 
 // Add to Column list and reset
