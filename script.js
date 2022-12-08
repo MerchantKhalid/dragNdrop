@@ -22,6 +22,7 @@ let listArrays = [];
 
 // Drag Functionality
 let draggedItem;
+let dragging=false;
 let currentColumn;
 
 
@@ -126,10 +127,14 @@ function updateDOM() {
 function updateItem(id,column){
   const selectedArray = listArrays[column];
   const selectedColumnEl= listColumns[column].children;
-  if(!selectedColumnEl[id].textContent){
-    delete selectedArray[id];
+  if(!dragging){
+    if(!selectedColumnEl[id].textContent){
+      delete selectedArray[id];
+    }else{
+      selectedArray[id]=selectedColumnEl[id].textContent;
+    }
+    updateDOM();
   }
-  updateDOM();
 }
 
 // Add to Column list and reset
@@ -159,6 +164,13 @@ function hideInputBox(column){
 
 //Allow arrays to reflect drag and drop items
 function rebuildArrays(){
+  // console.log(backlogList.children)
+  // backlogListArray= Array.from(backlogList.children).map(i=>i.textContent)
+  // progressListArray=Array.from(progressList.children).map(i=>i.textContent)
+  // completeListArray=Array.from(completeList.children).map(i=>i.textContent)
+  // onHoldListArray=Array.from(onHoldList.children).map(i=>i.textContent)
+
+  
   backlogListArray=[];
     for(i=0;i<backlogList.children.length;i++){
       backlogListArray.push(backlogList.children[i].textContent);
@@ -182,6 +194,7 @@ function rebuildArrays(){
 //when items start dragging
 function drag(e){
   draggedItem = e.target;
+  dragging= true;
 }
 
 //Column allows for item to drop
@@ -205,6 +218,8 @@ function drop(e){
   //add item to column
    const parent= listColumns[currentColumn];
    parent.appendChild(draggedItem)
+   //Dragging Complete
+   dragging= false;
    rebuildArrays();
 
 }
